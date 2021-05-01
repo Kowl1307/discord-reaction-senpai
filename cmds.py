@@ -9,13 +9,15 @@ class CmdsCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-
+    
+    '''
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def testEmbed(self, ctx):
         embed = Embed(title="Test Embed", description="This is an embed! It looks nicer than regular text.")
         await ctx.send(embed=embed)
-
+    '''
+    
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def createEmbed(self, ctx):

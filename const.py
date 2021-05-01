@@ -2,7 +2,5 @@
 DESCRIPTION = "This bot creates embeds with "
 #Time to answer when creating an embed (in seconds)
 TIMEOUT = 60
-#insert your bot token here
-TOKEN = ""
 #Command Prefix
 CMDPREFIX = "!"
