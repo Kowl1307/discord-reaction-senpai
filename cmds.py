@@ -31,7 +31,7 @@ class CmdsCog(commands.Cog):
         
         #Local functions needed for easier creation of the embed
         def partnerCheck(answer):
-            return answer.author == partner
+            return answer.author == partner and answer.channel == ctx.channel
 
 
         async def askPartner(question):
