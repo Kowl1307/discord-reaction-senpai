@@ -1,4 +1,4 @@
-from discord import Embed, TextChannel
+from discord import Embed, TextChannel, Colour
 from discord.ext import commands
 from const import TIMEOUT
 import asyncio
@@ -28,10 +28,14 @@ class CmdsCog(commands.Cog):
             return
 
         currentPartners.add(partner)
+
+        async def abortDialogue(abortMsg):
+            await ctx.send(abortMsg)
+            currentPartners.remove(partner)
         
         #Local functions needed for easier creation of the embed
         def partnerCheck(answer):
-            return answer.author == partner
+            return answer.author == partner and answer.channel == ctx.channel
 
 
         async def askPartner(question):
@@ -40,8 +44,8 @@ class CmdsCog(commands.Cog):
                 answer = await self.bot.wait_for("message", timeout=TIMEOUT, check=partnerCheck)
                 return answer
             except asyncio.TimeoutError:
-                await ctx.send("You took too long, so I cancelled the creation. You took more than ${TIMEOUT} seconds")
-                currentPartners.remove(partner)
+                await abortDialogue("You took too long, so I cancelled the creation. You took more than {0} seconds".format(TIMEOUT))
+                
 
         async def askPartnerForText(question):
             answer = await askPartner(question)
@@ -56,10 +60,21 @@ class CmdsCog(commands.Cog):
         
         #Ask the partner for info about the embed
         title = await askPartnerForText("Give me a title!")
+        if(len(title) >= 256):
+            await abortDialogue("Sorry mate, that's too long! Maximum length of the title is 256 characters!")
+            return
+
+        #Description
         description = await askPartnerForText("Give me a small text!")
         thumbnail = Embed.Empty
         if(await askPartnerYesNo("Do you want to add a thumbnail? (Answer with Yes/No)")):
             thumbnail = await askPartnerForText("Send me the URL!")
+        
+        #Color
+        desColor = await askPartnerForText("Which color should the embed have (Left side)? Send me the hex-code of the color! I.e. e91e63")
+        color = Colour(int(desColor,16))
+
+        
 
         #Ask in which channel the embed should go
         answer = await askPartner("Where should I send the embed to? Send the channel via #Channel!")
@@ -69,7 +84,7 @@ class CmdsCog(commands.Cog):
             channel = ctx.channel
 
         #Actually create the embed
-        embed = Embed(title=title, description=description)
+        embed = Embed(title=title, description=description, colour=color)
         embed.set_thumbnail(url=thumbnail)
         #Send the embed into the desired channel
         await channel.send(embed=embed)
