@@ -1,4 +1,5 @@
 *.pyc
 *.db
+*.db-journal
 __init__.py
 xyz.py

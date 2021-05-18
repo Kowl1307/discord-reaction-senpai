@@ -4,25 +4,52 @@ from const import DBNAME
 initialized = False
 
 # Database has table reactionRole(messageID, reactionEmote, roleID)
+def isInitialized():
+    if(not initialized):
+        print("Tried to change DB when uninitialized!")
+        return False
+    return True
+
+#Checks if a reaction is in the database
+def isReactionRole(messageID, emoteName):
+    if(not isInitialized()):
+        return
+    cur = sql.connect("{}.db".format(DBNAME)).cursor()
+    cur.execute("SELECT * from reactionRole where messageID = {} and reactionEmote = '{}';".format(messageID, emoteName))
+    if(cur.fetchone()):
+        cur.connection.close()
+        return True
+    cur.connection.close()
+    return False
+
+def getRoleOfReaction(messageID, emoteName):
+    if(not isInitialized()):
+        return 0
+    cur = sql.connect("{}.db".format(DBNAME)).cursor()
+    cur.execute("SELECT * from reactionRole where messageID = {} and reactionEmote = '{}';".format(messageID, emoteName))
+    roleID = cur.fetchone()
+    cur.connection.close()
+    if(roleID is None):
+        return 0
+    return roleID[2] # (messageID, reactionEmote, roleID) so roleID is [2]
+    
 
 #Adds a reaction role to the database
 def addReactionRole(messageID, emoteName, roleID):
-    if(not initialized):
-        print("Tried to change DB when uninitialized!")
-        return 0
+    if(not isInitialized()):
+        return
     cur = sql.connect("{}.db".format(DBNAME)).cursor()
-    cur.execute("INSERT INTO {} VALUES ({}, '{}', {}})".format(DBNAME, messageID, emoteName, roleID))
+    cur.execute("INSERT INTO reactionRole VALUES ({}, '{}', {})".format(messageID, emoteName, roleID))
     cur.connection.commit()
     cur.connection.close()
     return 1
 
 #Removes a reaction role from the database
 def removeReactionRole(messageID, emoteName):
-    if(not initialized):
-        print("Tried to change DB when uninitialized!")
-        return 0
+    if(not isInitialized()):
+        return
     cur = sql.connect("{}.db".format(DBNAME)).cursor()
-    cur.execute("DELETE FROM {} WHERE messageID = {} and reactionEmote = '{}'".format(DBNAME, messageID, emoteName))
+    cur.execute("DELETE FROM reactionRole WHERE messageID = {} and reactionEmote = '{}'".format(messageID, emoteName))
     cur.connection.commit()
     cur.connection.close()
     return 1
