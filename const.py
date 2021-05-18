@@ -4,3 +4,5 @@ DESCRIPTION = "This bot creates embeds with "
 TIMEOUT = 90
 #Command Prefix
 CMDPREFIX = "!"
+
+DBNAME = "reactionroles"
