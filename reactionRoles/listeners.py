@@ -17,6 +17,9 @@ class ReactionListenerCog(commands.Cog):
     async def on_raw_reaction_add(self, payload):
         emoji = payload.emoji
         user = payload.member
+        
+        if(user.id == self.bot.user.id):
+            return
 
         if(not isReactionRole(payload.message_id, str(emoji))):
             return
@@ -33,8 +36,6 @@ class ReactionListenerCog(commands.Cog):
         emoji = payload.emoji
         self.bot.get_guild(payload.guild_id).fetch_members()
         user = self.bot.get_guild(payload.guild_id).get_member(payload.user_id)
-        print(user)
-        print(self.bot.get_guild(payload.guild_id))
         if(not isReactionRole(payload.message_id, str(emoji))):
             return
 
